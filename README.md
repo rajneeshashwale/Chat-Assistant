@@ -14,16 +14,16 @@ Easy to extend: add image upload, typing indicators, persistent chat history (lo
 
 Built for developers who want a clean starting point: drop the HTML into your page, tweak the CSS, and wire the JS to your API key or server logic.
 
-Feature list (bullet, quick)
+Feature list (bullet, quick):-
 
-Responsive layout (desktop + mobile)
+Responsive layout (desktop + mobile).
 
-Automatic scroll to newest message
+Automatic scroll to newest message.
 
-Clear separation of UI and API logic (easy to plug-in any backend)
+Clear separation of UI and API logic (easy to plug-in any backend).
 
-Typing indicator + send on Enter support
+Typing indicator + send on Enter support.
 
-Customizable theme (colors, fonts, bubble styles)
+Customizable theme (colors, fonts, bubble styles).
 
-Zero external dependencies
+Zero external dependencies.
