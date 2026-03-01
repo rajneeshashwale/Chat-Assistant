@@ -12,7 +12,7 @@ function createChatBox(html, className) {
     return div;
 }
 
-// 🔹 Backend se text response lene ka function (Professional + Developer info)
+// Backend se text response lene ka function (Professional + Developer info)
 async function getApiResponse(aiChatBox) {
     let textElement = aiChatBox.querySelector(".text");
 
@@ -26,11 +26,11 @@ async function getApiResponse(aiChatBox) {
         });
 
         let data = await response.json();
-        textElement.innerText = data.reply || "⚠️ No response";
+        textElement.innerText = data.reply || "Warning: No response";
 
     } catch (error) {
         console.error(error);
-        textElement.innerText = "❌ Error fetching response";
+        textElement.innerText = "Error fetching response";
     } finally {
         aiChatBox.querySelector(".loading").style.display = "none";
     }
@@ -82,21 +82,35 @@ prompt.addEventListener("keydown", (e) => {
     }
 });
 
-// 🔹 Image upload (Professional + Developer info)
+// Image upload (ChatGPT-style preview + response)
 async function handleImageUpload(file) {
+    container.style.display = "none";
+
+    const instructionText = window.prompt(
+        "Optional: image ke liye instruction likho (blank chhodo to default description milega).",
+        ""
+    );
+    const safeInstructionText = (instructionText || "").trim();
+    const finalInstruction = safeInstructionText || "Describe the image in detail.";
+
+    const imageUrl = URL.createObjectURL(file);
     let userHtml = `
         <div class="img">
             <img src="user.png" width="60">
         </div>
-        <p class="text">📷 Image Uploaded</p>
+        <div class="text image-only">
+            <img class="uploaded-image" src="${imageUrl}" alt="Uploaded image">
+        </div>
+        ${safeInstructionText ? `<p class="text image-instruction">Instruction: ${safeInstructionText}</p>` : ""}
     `;
-    chatContainer.appendChild(createChatBox(userHtml, "user-chat-box"));
+    let userChatBox = createChatBox(userHtml, "user-chat-box");
+    chatContainer.appendChild(userChatBox);
 
     let aiHtml = `
         <div class="img">
             <img src="ai.png" width="60">
         </div>
-        <p class="text"></p>
+        <p class="text">Analyzing image...</p>
         <img class="loading" src="loading.gif" height="50">
     `;
     let aiChatBox = createChatBox(aiHtml, "ai-chat-box");
@@ -107,6 +121,7 @@ async function handleImageUpload(file) {
     try {
         const formData = new FormData();
         formData.append("image", file);
+        formData.append("prompt", finalInstruction);
 
         let response = await fetch("http://localhost:5000/image", {
             method: "POST",
@@ -114,14 +129,15 @@ async function handleImageUpload(file) {
         });
 
         let data = await response.json();
-        textElement.innerText = data.reply 
+        textElement.innerText = data.reply
             ? `${data.reply}\n\nMy Developer: Rajneesh Ashwale`
-            : "⚠️ No response";
+            : "Warning: No response";
 
     } catch (err) {
-        textElement.innerText = "❌ Error uploading image";
+        textElement.innerText = "Error uploading image";
     } finally {
         aiChatBox.querySelector(".loading").style.display = "none";
+        URL.revokeObjectURL(imageUrl);
     }
 }
 

@@ -5,10 +5,22 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
+:root {
+    --prompt-height: 15vh;
+}
+
 body {
     height: 100%;
     width: 100%;
     background-color: rgb(48, 57, 67);
+    overflow: hidden;
+}
+
+.container,
+.chat-container,
+.prompt-area {
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 .container {
@@ -17,7 +29,10 @@ body {
     display: flex;
     align-items: center;
     flex-direction: column;
-    padding-top: 5vh;
+    padding-top: 2vh;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    text-align: center;
 }
 
 .container h1 {
@@ -33,15 +48,18 @@ body {
 }
 
 .prompt-area {
-    width: 100%;
-    height: 15vh;
-    background-color: transparent;
+    width: min(1100px, 100%);
+    height: var(--prompt-height);
+    background-color: rgb(48, 57, 67);
     position: fixed;
     bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 2%;
+    backdrop-filter: blur(4px);
 }
 
 #prompt {
@@ -77,18 +95,20 @@ body {
 
 .chat-container {
     width: 100%;
-    max-height: calc(100vh - 12vh);
+    height: calc(100vh - var(--prompt-height));
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
-    padding: 1rem;
+    padding: 1rem 1rem 6rem 1rem;
 }
 
 .user-chat-box {
     max-width: 80%;
     padding: 1rem;
     display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
     background-color: rgb(75, 146, 209);
     border-radius: 2rem 2rem 0 2rem;
     color: rgba(255, 255, 255, 0.9);
@@ -100,6 +120,8 @@ body {
     max-width: 80%;
     padding: 1rem;
     display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
     background-color: rgba(75, 147, 209, 0.167);
     border-radius: 2rem 2rem 2rem 0;
     color: rgba(255, 255, 255, 0.9);
@@ -108,8 +130,32 @@ body {
 }
 
 .img {
-    height: 100%;
-    width: 6rem;
+    flex: 0 0 auto;
+    width: 3.5rem;
+}
+
+.image-only {
+    display: flex;
+    align-items: center;
+}
+
+.uploaded-image {
+    max-width: 360px;
+    width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    box-shadow: 2px 2px 10px black;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.image-instruction {
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.8rem;
+    background: rgba(0, 0, 0, 0.2);
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.95);
+    max-width: 360px;
 }
 
 /* File Upload Style */
@@ -139,18 +185,64 @@ label[for="imageUpload"]:hover {
 
 
 
+
 /* Responsive breakpoints */
+@media (max-width: 1024px) {
+    .container h1 {
+        font-size: 7.5vw;
+    }
+
+    .container h2 {
+        font-size: 3.6vw;
+    }
+
+    #prompt {
+        width: 68%;
+    }
+
+    #btn {
+        width: 16%;
+    }
+
+    .user-chat-box,
+    .ai-chat-box {
+        max-width: 88%;
+    }
+
+    .uploaded-image {
+        max-width: 320px;
+    }
+}
+
 @media (max-width: 768px) {
+    :root {
+        --prompt-height: 12vh;
+    }
+
+    .container h1 {
+        font-size: 10vw;
+    }
+
+    .container h2 {
+        font-size: 4.5vw;
+    }
+
+    .prompt-area {
+        height: 12vh;
+        padding: 0 4%;
+    }
+
     #prompt {
         font-size: 0.9rem;
         height: 8vh;
         padding: 0.8rem;
+        width: 70%;
     }
 
     #btn {
         font-size: 0.9rem;
         height: 8vh;
-        width: 15%;
+        width: 20%;
     }
 
     .user-chat-box,
@@ -158,9 +250,17 @@ label[for="imageUpload"]:hover {
         max-width: 90%;
         font-size: 0.9rem;
     }
+
+    .img {
+        width: 3rem;
+    }
 }
 
 @media (max-width: 480px) {
+    .container {
+        padding-top: 3vh;
+    }
+
     #prompt {
         font-size: 0.8rem;
         padding: 0.6rem;
@@ -179,5 +279,14 @@ label[for="imageUpload"]:hover {
     .ai-chat-box {
         max-width: 95%;
         font-size: 0.85rem;
+        padding: 0.8rem;
+    }
+
+    .uploaded-image {
+        max-width: 100%;
+    }
+
+    .image-instruction {
+        max-width: 100%;
     }
 }
