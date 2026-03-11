@@ -3,6 +3,10 @@ let container = document.querySelector(".container");
 let btn = document.querySelector("#btn");
 let chatContainer = document.querySelector(".chat-container");
 let userMessage = null;
+let pendingImageFile = null;
+let pendingImageUrl = null;
+let pendingImageChatBox = null;
+const defaultPromptPlaceholder = prompt.getAttribute("placeholder") || "Ask Something.....";
 
 // Chat box create function
 function createChatBox(html, className) {
@@ -21,7 +25,7 @@ async function getApiResponse(aiChatBox) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                message: `${userMessage}\n\nPlease respond in professional paragraph format without any markdown symbols like *, -, or --- and add at the end: "Developer: Rajneesh Ashwale".`
+                message: `${userMessage}\n\nPlease respond in professional paragraph format without any markdown symbols like *, -, or --- and add at the end: "MyDeveloper: Rajneesh Ashwale".`
             })
         });
 
@@ -52,7 +56,15 @@ function showLoading() {
 
 // Button click
 btn.addEventListener("click", () => {
-    userMessage = prompt.value.trim();
+    const inputText = prompt.value.trim();
+
+    if (pendingImageFile) {
+        container.style.display = "none";
+        submitImagePrompt(inputText);
+        return;
+    }
+
+    userMessage = inputText;
 
     if (!userMessage) {
         container.style.display = "flex";
@@ -83,17 +95,16 @@ prompt.addEventListener("keydown", (e) => {
 });
 
 // Image upload (ChatGPT-style preview + response)
-async function handleImageUpload(file) {
+function handleImageUpload(file) {
     container.style.display = "none";
 
-    const instructionText = window.prompt(
-        "Optional: image ke liye instruction likho (blank chhodo to default description milega).",
-        ""
-    );
-    const safeInstructionText = (instructionText || "").trim();
-    const finalInstruction = safeInstructionText || "Describe the image in detail.";
+    if (pendingImageUrl) {
+        URL.revokeObjectURL(pendingImageUrl);
+    }
 
     const imageUrl = URL.createObjectURL(file);
+    pendingImageFile = file;
+    pendingImageUrl = imageUrl;
     let userHtml = `
         <div class="img">
             <img src="user.png" width="60">
@@ -101,10 +112,29 @@ async function handleImageUpload(file) {
         <div class="text image-only">
             <img class="uploaded-image" src="${imageUrl}" alt="Uploaded image">
         </div>
-        ${safeInstructionText ? `<p class="text image-instruction">Instruction: ${safeInstructionText}</p>` : ""}
     `;
-    let userChatBox = createChatBox(userHtml, "user-chat-box");
-    chatContainer.appendChild(userChatBox);
+    pendingImageChatBox = createChatBox(userHtml, "user-chat-box");
+    chatContainer.appendChild(pendingImageChatBox);
+
+    prompt.value = "";
+    prompt.setAttribute("placeholder", "Add a prompt for this image (optional)...");
+    prompt.focus();
+}
+
+async function submitImagePrompt(instructionText) {
+    const safeInstructionText = (instructionText || "").trim();
+    const finalInstruction = safeInstructionText || "Describe the image in detail.";
+
+    if (!pendingImageFile || !pendingImageUrl || !pendingImageChatBox) {
+        return;
+    }
+
+    if (safeInstructionText) {
+        const instructionEl = document.createElement("p");
+        instructionEl.className = "text image-instruction";
+        instructionEl.innerText = `Instruction: ${safeInstructionText}`;
+        pendingImageChatBox.appendChild(instructionEl);
+    }
 
     let aiHtml = `
         <div class="img">
@@ -120,7 +150,7 @@ async function handleImageUpload(file) {
 
     try {
         const formData = new FormData();
-        formData.append("image", file);
+        formData.append("image", pendingImageFile);
         formData.append("prompt", finalInstruction);
 
         let response = await fetch("http://localhost:5000/image", {
@@ -137,7 +167,12 @@ async function handleImageUpload(file) {
         textElement.innerText = "Error uploading image";
     } finally {
         aiChatBox.querySelector(".loading").style.display = "none";
-        URL.revokeObjectURL(imageUrl);
+        URL.revokeObjectURL(pendingImageUrl);
+        pendingImageFile = null;
+        pendingImageUrl = null;
+        pendingImageChatBox = null;
+        prompt.value = "";
+        prompt.setAttribute("placeholder", defaultPromptPlaceholder);
     }
 }
 
@@ -145,6 +180,7 @@ async function handleImageUpload(file) {
 document.getElementById("imageUpload").addEventListener("change", (e) => {
     let file = e.target.files[0];
     if (file) handleImageUpload(file);
+    e.target.value = "";
 });
 
 // Auto scroll
