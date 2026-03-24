@@ -35,16 +35,20 @@ body {
     text-align: center;
 }
 
-.container h1 {
-    font-size: 6vw;
+.container h1,
+.container h2 {
+    font-family: 'Times New Roman', Times, serif;
     background: linear-gradient(to right, rgb(210, 193, 193), rgb(95, 206, 237), rgb(234, 61, 171));
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
+.container h1 {
+    font-size: 6vw;
+}
+
 .container h2 {
     font-size: 3vw;
-    color: #fff;
 }
 
 .prompt-area {

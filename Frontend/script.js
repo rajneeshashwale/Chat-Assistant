@@ -19,7 +19,7 @@ function createChatBox(html, className) {
 // Backend se text response lene ka function (Professional + Developer info)
 async function getApiResponse(aiChatBox) {
     let textElement = aiChatBox.querySelector(".text");
-
+backend_url = ""
     try {
         let response = await fetch("http://localhost:5000/chat", {
             method: "POST",
